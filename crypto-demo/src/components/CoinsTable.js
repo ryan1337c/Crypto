@@ -19,12 +19,26 @@ import {
 import { ThemeProvider } from "@emotion/react";
 import axios from "axios";
 
+export function numberWithCommas(x) {
+  return x.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+}
+
+export function simplifyNumber(x) {
+  const oneTrillion = 1000000000000;
+  const oneBillion = 1000000000;
+  const oneMillion = 1000000;
+  if (x > oneTrillion) return (x / oneTrillion).toFixed(2) + "T";
+  else if (x > oneBillion) return (x / oneBillion).toFixed(2) + "B";
+  else if (x > oneMillion) return (x / oneMillion).toFixed2(2) + "M";
+  else return numberWithCommas(x);
+}
+
 const CoinsTable = () => {
   const [coins, setCoins] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
-  const { currency } = CryptoState();
+  const { currency, symbol } = CryptoState();
 
   const navigate = useNavigate();
 
@@ -38,28 +52,31 @@ const CoinsTable = () => {
     },
   });
 
-  const handleSearch = () => {
-    return coins.filter((coin) => {
-      coin.name.toLowerCase().includes(search) ||
-        coin.symbol.toLowerCase().includes(search);
-    });
-  };
-
   // fetch from api
   const fetchCoins = async () => {
     setLoading(true);
     try {
-      const { data } = axios.get(CoinList(currency));
+      const { data } = await axios.get(CoinList(currency));
       setCoins(data);
     } catch (error) {
-      console.log("Error in trying to fetch list of coins", error.message);
+      console.log("Error trying to fetch coin list", error.message);
     }
     setLoading(false);
+    console.log(coins);
   };
 
   useEffect(() => {
     fetchCoins();
   }, [currency]);
+
+  const handleSearch = () => {
+    return coins.filter((coin) => {
+      return (
+        coin.name.toLowerCase().includes(search) ||
+        coin.symbol.toLowerCase().includes(search)
+      );
+    });
+  };
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -113,8 +130,53 @@ const CoinsTable = () => {
                 {handleSearch().map((row) => {
                   const profit = row.price_change_percentage_24h > 0;
                   return (
-                    <TableRow onClick={() => navigate(`./coins/${row.id}`)}>
-                      {}
+                    <TableRow
+                      onClick={() => navigate(`./coins/${row.id}`)}
+                      className="row"
+                      key={row.name}
+                    >
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        style={{
+                          display: "flex",
+                          gap: 15,
+                        }}
+                      >
+                        <img
+                          src={row?.image}
+                          alt={row.name}
+                          height="50"
+                          style={{ marginBottom: 10 }}
+                        />
+                        <div
+                          style={{ display: "flex", flexDirection: "column" }}
+                        >
+                          <span
+                            style={{ textTransform: "uppercase", fontSize: 22 }}
+                          >
+                            {row.symbol}
+                          </span>
+                          <span style={{ color: "darkgrey" }}>{row.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell align="right">
+                        {symbol}{" "}
+                        {numberWithCommas(row.current_price.toFixed(2))}
+                      </TableCell>
+                      <TableCell
+                        align="right"
+                        style={{
+                          color: profit > 0 ? "rgb(14,203,129)" : "red",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {profit && "+"}
+                        {row.price_change_percentage_24h.toFixed(2)}%
+                      </TableCell>
+                      <TableCell align="right">
+                        {symbol} {simplifyNumber(row.market_cap)}
+                      </TableCell>
                     </TableRow>
                   );
                 })}
