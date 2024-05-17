@@ -36,8 +36,11 @@ const Header = () => {
               className="title"
               fontWeight="bold"
               variant="h6"
+              style={{
+                fontFamily: "Fira Sans",
+              }}
             >
-              Crypto Hunter
+              Crypto Demo
             </Typography>
             <Select
               variant="outlined"
