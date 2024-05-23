@@ -5,6 +5,8 @@ import { CryptoState } from "../CryptoContext";
 import AliceCarousel from "react-alice-carousel";
 import "react-alice-carousel/lib/alice-carousel.css"; // For our carousel
 import { Link } from "react-router-dom";
+import { CircularProgress } from "@mui/material";
+import Stack from "@mui/material/Stack";
 
 export function numberWithCommas(x) {
   return x.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
@@ -13,16 +15,18 @@ export function numberWithCommas(x) {
 const Carousel = () => {
   const [trending, setTrending] = useState([]);
   const { currency, symbol } = CryptoState();
+  const [loading, setLoading] = useState(false);
 
   const fetchTrendingCoin = async () => {
+    setLoading(true);
     try {
       const { data } = await axios.get(TrendingCoins(currency));
       setTrending(data);
     } catch (error) {
-      console.log("Error trying to fetch Trending Coins", error.message);
+      console.log("Error in fetching trending coins", error.message);
     }
+    setLoading(false);
   };
-
   useEffect(() => {
     fetchTrendingCoin();
   }, [currency]);
@@ -30,9 +34,8 @@ const Carousel = () => {
   // carousel variables
   const items = trending.map((coin) => {
     let profit = coin.price_change_percentage_24h >= 0;
-
     return (
-      <Link className="carouselItem" to={`/coin/${coin.id}`}>
+      <Link className="carouselItem" to={`/coins/${coin.id}`}>
         <img
           src={coin?.image}
           alt={coin.name}
@@ -68,16 +71,22 @@ const Carousel = () => {
 
   return (
     <div className="carousel">
-      <AliceCarousel
-        mouseTracking
-        infinite
-        autoPlayInterval={1000}
-        animationDuration={1500}
-        disableDotsControls
-        responsive={responsive}
-        autoPlay
-        items={items}
-      />
+      {loading ? (
+        <Stack sx={{ color: "grey.500" }} spacing={2} direction="row">
+          <CircularProgress sx={{ color: "#ff9100" }} />
+        </Stack>
+      ) : (
+        <AliceCarousel
+          mouseTracking
+          infinite
+          autoPlayInterval={1000}
+          animationDuration={1500}
+          disableDotsControls
+          responsive={responsive}
+          autoPlay
+          items={items}
+        />
+      )}
     </div>
   );
 };
