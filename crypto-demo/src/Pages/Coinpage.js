@@ -41,7 +41,11 @@ const Coinpage = () => {
 
   const fetchCoin = async () => {
     try {
-      const { data } = await axios.get(SingleCoin(id));
+      const { data } = await axios.get(SingleCoin(id), {
+        header: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
       setCoin(data);
 
       console.log(data);

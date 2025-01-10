@@ -60,7 +60,11 @@ const CoinsTable = () => {
   const fetchCoins = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(CoinList(currency));
+      const { data } = await axios.get(CoinList(currency), {
+        header: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
       setCoins(data);
     } catch (error) {
       console.log("Error trying to fetch coin list", error.message);

@@ -20,7 +20,11 @@ const Carousel = () => {
   const fetchTrendingCoin = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(TrendingCoins(currency));
+      const { data } = await axios.get(TrendingCoins(currency), {
+        header: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
       setTrending(data);
     } catch (error) {
       console.log("Error in fetching trending coins", error.message);
