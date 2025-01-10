@@ -1,3 +1,5 @@
+Overview:
+   A crypto price tracking platform for the hottest cryptocurrency on the market 
 Set up:
 1. Clone Repository: Open terminal and run:
    ![image](https://github.com/ryan1337c/Crypto/assets/102636636/5c32875a-814b-476c-bb88-60b3f584f547)
