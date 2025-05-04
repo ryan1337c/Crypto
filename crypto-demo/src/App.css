@@ -85,6 +85,11 @@ a {
     border-radius: 5px;
 }
 
+.timeFrames.selected-timeframe {
+  color: red;
+  font-weight: bold;
+}
+
 .timeFrames:hover {
   color: black;
 }

@@ -6,14 +6,31 @@ const Crypto = createContext();
 const CryptoContext = ({ children }) => {
   const [currency, setCurrency] = useState("usd");
   const [symbol, setSymbol] = useState("$");
+  const [chain, setChain] = useState("ALL CHAINS");
+  const [tokenHistory, setTokenHistory] = useState({});
+  const [coin, setCoin] = useState();
 
   useEffect(() => {
-    if (currency === "usd") setSymbol("$");
+    if (chain !== "ALL CHAINS") {
+      setSymbol("$");
+    } else if (currency === "usd") setSymbol("$");
     else if (currency === "eur") setSymbol("€");
   }, [currency]);
 
   return (
-    <Crypto.Provider value={{ currency, symbol, setCurrency }}>
+    <Crypto.Provider
+      value={{
+        currency,
+        symbol,
+        chain,
+        tokenHistory,
+        coin,
+        setCurrency,
+        setChain,
+        setTokenHistory,
+        setCoin,
+      }}
+    >
       {children}
     </Crypto.Provider>
   );

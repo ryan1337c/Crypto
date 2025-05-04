@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import {
   Container,
@@ -14,7 +14,7 @@ import { CryptoState } from "../CryptoContext";
 
 const Header = () => {
   const navigate = useNavigate();
-  const { currency, setCurrency } = CryptoState();
+  const { currency, setCurrency, chain, setChain } = CryptoState();
 
   const darkTheme = createTheme({
     palette: {
@@ -25,6 +25,16 @@ const Header = () => {
     },
   });
 
+  useEffect(() => {
+    // Chains fetched from birdeye only supports usd currency
+    if (chain !== "ALL CHAINS" && currency !== "usd") setCurrency("usd");
+  }, [chain]);
+
+  const handleOnClick = () => {
+    setChain("ALL CHAINS");
+    navigate("/");
+  };
+
   return (
     <ThemeProvider theme={darkTheme}>
       <AppBar color="transparent" position="static">
@@ -32,7 +42,7 @@ const Header = () => {
         <Container>
           <Toolbar>
             <Typography
-              onClick={() => navigate("/")}
+              onClick={() => handleOnClick()}
               className="title"
               fontWeight="bold"
               variant="h6"
@@ -53,7 +63,9 @@ const Header = () => {
               onChange={(e) => setCurrency(e.target.value)}
             >
               <MenuItem value={"usd"}>USD</MenuItem>
-              <MenuItem value={"eur"}>EURO</MenuItem>
+              <MenuItem value={"eur"} disabled={chain != "ALL CHAINS"}>
+                EURO
+              </MenuItem>
             </Select>
           </Toolbar>
         </Container>

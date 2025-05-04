@@ -16,7 +16,6 @@ import {
   Colors,
   Tooltip,
 } from "chart.js";
-import { CircularProgress } from "@mui/material";
 
 ChartJS.register(
   LineElement,
@@ -34,21 +33,24 @@ const CoinInfo = ({ coin }) => {
   const [timeFrame, setTimeFrame] = useState(1);
   const [historicData, setHistoricData] = useState();
   const { currency } = CryptoState();
-  const [loading, setLoading] = useState(false);
 
   const fetchCoinHistory = async () => {
-    setLoading(true);
-    const { data } = await axios.get(
-      HistoricalChart(coin.id, timeFrame, currency)
-    );
-    setHistoricData(data.prices);
-    console.log(data);
-    setLoading(false);
+    try {
+      const { data } = await axios.get(
+        HistoricalChart(coin.id, timeFrame, currency)
+      );
+      setHistoricData(data.prices);
+      console.log("coininfo", data);
+    } catch (err) {
+      console.log("coin id", coin.id);
+      console.error(err);
+    }
   };
 
+  // Fetch data whenever timeframe is updated
   useEffect(() => {
-    fetchCoinHistory();
-  }, [timeFrame, currency]);
+    if (coin) fetchCoinHistory();
+  }, [timeFrame]); // depends only on timeFrame
 
   const chartTheme = createTheme({
     palette: {
@@ -74,20 +76,8 @@ const CoinInfo = ({ coin }) => {
           width: "100%",
         }}
       >
-        {!historicData | loading ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: "15%",
-            }}
-          >
-            <CircularProgress sx={{ color: "#ff9100" }} size="7rem" />
-          </div>
-        ) : (
-          <>
+        {historicData && (
+          <div>
             <div className="timeFrames-container">
               {timeFrameOptions.map((timeFrame) => {
                 return (
@@ -133,7 +123,7 @@ const CoinInfo = ({ coin }) => {
                 }}
               />
             </div>
-          </>
+          </div>
         )}
       </Container>
     </ThemeProvider>
